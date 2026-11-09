@@ -7,7 +7,7 @@ import "@fontsource/atkinson-hyperlegible/latin-700.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Quiero — Spanish by what you'll use most",
+  title: "Quiero Spanish",
   description: "Learn Mexican Spanish starting from the most-used words, with retrieval practice.",
 };
 

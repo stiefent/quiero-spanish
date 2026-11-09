@@ -18,7 +18,7 @@ type View =
 
 function readHash(): View {
   if (typeof window === "undefined") return { name: "home" };
-  const m = window.location.hash.match(/^#\/unit\/(.+)$/);
+  const m = window.location.hash.match(/^#unit-(.+)$/);
   if (m && UNITS.some((u) => u.id === m[1])) return { name: "unit", id: m[1] };
   return { name: "home" };
 }
@@ -58,7 +58,7 @@ export default function App() {
     );
   }
 
-  if (view.name === "done") return <Done score={view.score} unitId={view.id} progress={progress} onHome={() => { go("/"); setView({ name: "home" }); }} onAgain={() => view.id && setView({ name: "lesson", id: view.id, exercises: buildLesson(UNITS.find((u) => u.id === view.id)!, progress, ALL_ITEMS) })} />;
+  if (view.name === "done") return <Done score={view.score} unitId={view.id} progress={progress} onHome={() => { go("home"); setView({ name: "home" }); }} onAgain={() => view.id && setView({ name: "lesson", id: view.id, exercises: buildLesson(UNITS.find((u) => u.id === view.id)!, progress, ALL_ITEMS) })} />;
 
   if (view.name === "unit") {
     const unit = UNITS.find((u) => u.id === view.id)!;
@@ -66,7 +66,7 @@ export default function App() {
       <UnitIntro
         unit={unit}
         progress={progress}
-        onBack={() => go("/")}
+        onBack={() => go("home")}
         onStart={() => setView({ name: "lesson", id: unit.id, exercises: buildLesson(unit, progress, ALL_ITEMS) })}
       />
     );
@@ -75,7 +75,7 @@ export default function App() {
   return (
     <Home
       progress={progress}
-      onOpen={(id) => go(`/unit/${id}`)}
+      onOpen={(id) => go(`unit-${id}`)}
       onReview={() => setView({ name: "review", exercises: buildReview(ALL_ITEMS, progress) })}
     />
   );
@@ -155,16 +155,30 @@ function Home({ progress, onOpen, onReview }: { progress: Progress; onOpen: (id:
 
       <footer className="mt-14 space-y-2 text-sm text-ink-soft">
         <p>Word lists and method from Ron Ragsdale’s course, based on the Laws of Probability of Usage. Mexican Spanish.</p>
-        <button
-          className="underline"
-          onClick={() => {
-            if (window.confirm("Erase all progress on this device?")) resetProgress();
-          }}
-        >
-          Reset progress
-        </button>
+        <ResetProgress />
       </footer>
     </div>
+  );
+}
+
+function ResetProgress() {
+  const [asking, setAsking] = useState(false);
+  if (!asking)
+    return (
+      <button className="underline" onClick={() => setAsking(true)}>
+        Reset progress
+      </button>
+    );
+  return (
+    <p className="flex flex-wrap items-center gap-3">
+      <span>Erase all progress on this device?</span>
+      <button className="font-bold text-coral underline" onClick={() => { resetProgress(); setAsking(false); }}>
+        Erase progress
+      </button>
+      <button className="underline" onClick={() => setAsking(false)}>
+        Keep it
+      </button>
+    </p>
   );
 }
 
